@@ -25,7 +25,7 @@ class Menu:
 
     def _input_expression(self):
         print("Введите выражение в постфиксной записи (числа и операции разделены пробелами)")
-        print("(для возврата в меню нажмите Enter или введите 'menu'):")
+        print("(для возврата в меню оставьте строку пустой или введите 'menu'):")
         while True:
             expr = input("> ").strip()
             if expr == '' or expr.lower() == 'menu':
@@ -35,10 +35,10 @@ class Menu:
                 return expr
             except (ValueError, ZeroDivisionError) as e:
                 print(f"Ошибка: {e}")
-                print("Попробуйте ещё раз или нажмите Enter для возврата в меню.")
+                print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _read_from_file(self):
-        print("Введите название файла (Enter для возврата в меню):")
+        print("Введите путь к файлу (пустая строка для возврата в меню):")
         while True:
             filename = input("> ").strip()
             if filename == '':
@@ -55,13 +55,34 @@ class Menu:
                 print(f"Ошибка в содержимом файла: {e}")
             except Exception as e:
                 print(f"Непредвиденная ошибка: {e}")
-            print("Попробуйте ещё раз или нажмите Enter для возврата в меню.")
+            print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _generate_expression(self):
         print("Генерируется случайное выражение...")
         expr = self.generator.generate()
         print(f"Сгенерированное выражение: {expr}")
         return expr
+
+    def _save_result(self, result):
+        while True:
+            answer = input("Сохранить результат в файл? (д/н или y/n): ").strip().lower()
+            if answer in ('д', 'y', 'yes', 'да'):
+                filename = input("Введите имя файла для сохранения: ").strip()
+                if filename == '':
+                    print("Имя файла не может быть пустым. Сохранение отменено.")
+                    return
+                try:
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        f.write(str(result))
+                    print(f"Результат сохранён в файл '{filename}'.")
+                except IOError as e:
+                    print(f"Ошибка сохранения: {e}")
+                return
+            elif answer in ('н', 'n', 'no', 'нет'):
+                print("Сохранение отменено.")
+                return
+            else:
+                print("Пожалуйста, ответьте 'д' (да) или 'н' (нет).")
 
     def run(self):
         while True:
@@ -81,9 +102,11 @@ class Menu:
 
             if expr is None:
                 continue
+
             try:
                 result = self.calculator.evaluate(expr)
                 print(f"\nРезультат: {result}\n")
+                self._save_result(result)
             except Exception as e:
                 print(f"Ошибка при вычислении: {e}")
-            input("Нажмите Enter, чтобы продолжить")
+            input("Нажмите Enter, чтобы продолжить...")
