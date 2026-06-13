@@ -1,41 +1,41 @@
 class ExpressionGenerator:
-    """Генерация случайного корректного постфиксного выражения без использования random."""
-    def __init__(self, seed=42):
-        # Простой линейный конгруэнтный генератор
+    """Генератор случайных постфиксных выражений."""
+    def __init__(self, seed=0):
         self.state = seed
-        self.modulus = 2**31
-        self.multiplier = 1103515245
-        self.increment = 12345
 
-    def _next_float(self):
-        """Генерирует псевдослучайное число в диапазоне [0, 1)."""
-        self.state = (self.multiplier * self.state + self.increment) % self.modulus
-        return self.state / self.modulus
-
-    def _uniform(self, low, high):
-        """Случайное число в [low, high)."""
-        return low + self._next_float() * (high - low)
+    def _next(self):
+        """Следующее случайное число от 0 до 99."""
+        self.state = (self.state + 1) % 100
+        return self.state
 
     def _randint(self, low, high):
-        """Случайное целое число в [low, high]. (включительно)"""
-        return int(self._uniform(low, high + 1))
+        """Возвращает целое случайное число от low до high."""
+        r = self._next()
+        return low + (r % (high - low + 1))
 
     def _choice(self, seq):
-        """Случайный элемент из последовательности."""
+        """Случайный элемент из списка."""
         idx = self._randint(0, len(seq) - 1)
         return seq[idx]
 
     def generate(self, min_operands=2, max_operands=6):
+        """Возвращает строку в виде постфиксного выражения."""
         operations = ['+', '-', '*', '/']
-
         num_operands = self._randint(min_operands, max_operands)
-        # Создаём операнды (положительные вещественные от 1 до 20)
-        operands = [round(self._uniform(1, 20), 2) for _ in range(num_operands)]
+        operands = []
 
-        # Рекурсивное построение бинарного дерева в постфиксном порядке
+        for i in range(num_operands):
+            whole = self._randint(1, 19)
+            frac = self._randint(0, 99)
+            value = whole + frac / 100.0
+            operands.append(round(value, 2))
+
+        operands_copy = operands[:]
+
         def build_tree(leaf_count):
+            """Рекурсивно строит список токенов в постфиксном порядке."""
             if leaf_count == 1:
-                return [str(operands.pop(0))]
+                return [str(operands_copy.pop(0))]
             left_leaves = self._randint(1, leaf_count - 1)
             right_leaves = leaf_count - left_leaves
             left_expr = build_tree(left_leaves)
@@ -43,7 +43,5 @@ class ExpressionGenerator:
             op = self._choice(operations)
             return left_expr + right_expr + [op]
 
-        # Копируем, так как будем изменять список
-        operands_copy = operands[:]
         tokens = build_tree(num_operands)
         return ' '.join(tokens)
