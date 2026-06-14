@@ -38,7 +38,7 @@ class Menu:
                 print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _read_from_file(self):
-        print("Введите путь к файлу (пустая строка для возврата в меню):")
+        print("Введите название файла (пустая строка для возврата в меню):")
         while True:
             filename = input("> ").strip()
             if filename == '':
@@ -118,7 +118,7 @@ class Menu:
                     if not self._ask_repeat(action_name):
                         break
             elif choice == '2':
-                action_name = "прочитать файл"
+                action_name = "ввести название файла"
                 while True:
                     expr = self._read_from_file()
                     if expr is None:
