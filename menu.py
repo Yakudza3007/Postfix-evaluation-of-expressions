@@ -38,13 +38,14 @@ class Menu:
                 print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _read_from_file(self):
-        print("Введите название файла (пустая строка для возврата в меню):")
+        print("Введите путь к файлу (пустая строка для возврата в меню):")
         while True:
             filename = input("> ").strip()
             if filename == '':
                 return None
             try:
                 expr = self.file_handler.read_from_file(filename)
+                print(f"Содержимое файла: {expr}")
                 self.calculator.evaluate(expr)
                 return expr
             except FileNotFoundError:
@@ -52,10 +53,13 @@ class Menu:
             except IOError as e:
                 print(f"Ошибка ввода-вывода: {e}")
             except (ValueError, ZeroDivisionError) as e:
+                if 'expr' in locals():
+                    print(f"Содержимое файла (повторно): {expr}")
                 print(f"Ошибка в содержимом файла: {e}")
             except Exception as e:
                 print(f"Непредвиденная ошибка: {e}")
-            print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
+            print(
+                "Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _generate_expression(self):
         """Генерирует случайное выражение."""
