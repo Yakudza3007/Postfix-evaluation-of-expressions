@@ -68,6 +68,7 @@ class Menu:
         return expr
 
     def _save_result(self, result):
+        """Предлагает сохранить результат в файл с повторными попытками при ошибке."""
         while True:
             answer = input(
                 "Сохранить результат в файл? (д/н или y/n): ").strip().lower()
@@ -83,19 +84,21 @@ class Menu:
                             f.write(str(result))
                         print(f"Результат сохранён в файл '{filename}'.")
                         return
-                    except IOError as e:
-                        err_msg = str(e)
-                        if "No such file or directory" in err_msg:
+                    except OSError as e:
+                        if e.errno == 22:
                             print(
-                                "Ошибка: указанный путь не существует. Проверьте правильность пути.")
-                        elif "Permission denied" in err_msg:
+                                "Ошибка: имя файла содержит недопустимые символы или неправильно сформировано.")
+                        elif e.errno == 2:
+                            print(
+                                "Ошибка: указанный каталог не существует. Проверьте путь.")
+                        elif e.errno == 13:
                             print(
                                 "Ошибка: недостаточно прав для записи в указанный файл или папку.")
-                        elif "Is a directory" in err_msg:
+                        elif e.errno == 21:
                             print(
                                 "Ошибка: указанное имя является папкой, а не файлом.")
                         else:
-                            print(f"Ошибка: {err_msg}")
+                            print(f"Ошибка: {e.strerror}")
                         print("Попробуйте ввести другое имя файла.")
                         continue
             elif answer in ('н', 'n', 'no', 'нет'):
