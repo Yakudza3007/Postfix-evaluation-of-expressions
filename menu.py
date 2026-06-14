@@ -68,36 +68,41 @@ class Menu:
         return expr
 
     def _save_result(self, result):
-        """Предлагает пользователю сохранить результат в файл."""
         while True:
-            answer = input("Сохранить результат в файл? (д/н или y/n): ").strip().lower()
+            answer = input(
+                "Сохранить результат в файл? (д/н или y/n): ").strip().lower()
             if answer in ('д', 'y', 'yes', 'да'):
-                filename = input("Введите имя файла для сохранения: ").strip()
-                if filename == '':
-                    print("Имя файла не может быть пустым. Сохранение отменено.")
-                    return
-                try:
-                    with open(filename, 'w', encoding='utf-8') as f:
-                        f.write(str(result))
-                    print(f"Результат сохранён в файл '{filename}'.")
-                except IOError as e:
-                    print(f"Ошибка сохранения: {e}")
-                return
+                while True:
+                    filename = input(
+                        "Введите имя файла для сохранения (пустая строка - отмена): ").strip()
+                    if filename == '':
+                        print("Сохранение отменено.")
+                        return
+                    try:
+                        with open(filename, 'w', encoding='utf-8') as f:
+                            f.write(str(result))
+                        print(f"Результат сохранён в файл '{filename}'.")
+                        return
+                    except IOError as e:
+                        err_msg = str(e)
+                        if "No such file or directory" in err_msg:
+                            print(
+                                "Ошибка: указанный путь не существует. Проверьте правильность пути.")
+                        elif "Permission denied" in err_msg:
+                            print(
+                                "Ошибка: недостаточно прав для записи в указанный файл или папку.")
+                        elif "Is a directory" in err_msg:
+                            print(
+                                "Ошибка: указанное имя является папкой, а не файлом.")
+                        else:
+                            print(f"Ошибка: {err_msg}")
+                        print("Попробуйте ввести другое имя файла.")
+                        continue
             elif answer in ('н', 'n', 'no', 'нет'):
                 print("Сохранение отменено.")
                 return
             else:
                 print("Пожалуйста, ответьте 'д' (да) или 'н' (нет).")
-
-    def _ask_repeat(self, action_name):
-        while True:
-            answer = input(f"1 - {action_name} ещё раз, 2 - вернуться в главное меню: ").strip()
-            if answer == '1':
-                return True
-            elif answer == '2':
-                return False
-            else:
-                print("Пожалуйста, введите 1 или 2.")
 
     def run(self):
         while True:
