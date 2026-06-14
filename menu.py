@@ -58,24 +58,19 @@ class Menu:
                 print(f"Ошибка в содержимом файла: {e}")
             except Exception as e:
                 print(f"Непредвиденная ошибка: {e}")
-            print(
-                "Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
+            print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _generate_expression(self):
-        """Генерирует случайное выражение."""
         expr = self.generator.generate()
         print(f"Сгенерированное выражение: {expr}")
         return expr
 
     def _save_result(self, result):
-        """Предлагает сохранить результат в файл."""
         while True:
-            answer = input(
-                "Сохранить результат в файл? (д/н или y/n): ").strip().lower()
+            answer = input("Сохранить результат в файл? (д/н или y/n): ").strip().lower()
             if answer in ('д', 'y', 'yes', 'да'):
                 while True:
-                    filename = input(
-                        "Введите имя файла для сохранения (пустая строка - отмена): ").strip()
+                    filename = input("Введите имя файла для сохранения (пустая строка - отмена): ").strip()
                     if filename == '':
                         print("Сохранение отменено.")
                         return
@@ -85,13 +80,22 @@ class Menu:
                         print(f"Результат сохранён в файл '{filename}'.")
                         return
                     except Exception:
-                        print(
-                            "Ошибка: такое название файла не поддерживается.")
+                        print("Ошибка: такое название файла не поддерживается.")
             elif answer in ('н', 'n', 'no', 'нет'):
                 print("Сохранение отменено.")
                 return
             else:
                 print("Пожалуйста, ответьте 'д' (да) или 'н' (нет).")
+
+    def _ask_repeat(self, action_name):
+        while True:
+            answer = input(f"1 - {action_name} ещё раз, 2 - вернуться в главное меню: ").strip()
+            if answer == '1':
+                return True
+            elif answer == '2':
+                return False
+            else:
+                print("Пожалуйста, введите 1 или 2.")
 
     def run(self):
         while True:
@@ -116,7 +120,7 @@ class Menu:
                     if not self._ask_repeat(action_name):
                         break
             elif choice == '2':
-                action_name = "ввести название файла"
+                action_name = "прочитать файл"
                 while True:
                     expr = self._read_from_file()
                     if expr is None:
@@ -133,8 +137,6 @@ class Menu:
                 action_name = "сгенерировать выражение"
                 while True:
                     expr = self._generate_expression()
-                    if expr is None:
-                        break
                     try:
                         result = self.calculator.evaluate(expr)
                         print(f"\nРезультат: {result}\n")
