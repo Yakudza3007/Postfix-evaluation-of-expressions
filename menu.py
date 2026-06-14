@@ -58,12 +58,13 @@ class Menu:
             print("Попробуйте ещё раз или оставьте пустую строку для возврата в меню.")
 
     def _generate_expression(self):
-        print("Генерируется случайное выражение...")
+        """Генерирует случайное выражение."""
         expr = self.generator.generate()
         print(f"Сгенерированное выражение: {expr}")
         return expr
 
     def _save_result(self, result):
+        """Предлагает пользователю сохранить результат в файл."""
         while True:
             answer = input("Сохранить результат в файл? (д/н или y/n): ").strip().lower()
             if answer in ('д', 'y', 'yes', 'да'):
@@ -84,6 +85,16 @@ class Menu:
             else:
                 print("Пожалуйста, ответьте 'д' (да) или 'н' (нет).")
 
+    def _ask_repeat(self, action_name):
+        while True:
+            answer = input(f"1 - {action_name} ещё раз, 2 - вернуться в главное меню: ").strip()
+            if answer == '1':
+                return True
+            elif answer == '2':
+                return False
+            else:
+                print("Пожалуйста, введите 1 или 2.")
+
     def run(self):
         while True:
             self._print_menu()
@@ -92,21 +103,45 @@ class Menu:
                 print("Выход из программы.")
                 return
 
-            expr = None
             if choice == '1':
-                expr = self._input_expression()
+                action_name = "ввести выражение"
+                while True:
+                    expr = self._input_expression()
+                    if expr is None:
+                        break
+                    try:
+                        result = self.calculator.evaluate(expr)
+                        print(f"\nРезультат: {result}\n")
+                        self._save_result(result)
+                    except Exception as e:
+                        print(f"Ошибка при вычислении: {e}")
+                    if not self._ask_repeat(action_name):
+                        break
             elif choice == '2':
-                expr = self._read_from_file()
+                action_name = "прочитать файл"
+                while True:
+                    expr = self._read_from_file()
+                    if expr is None:
+                        break
+                    try:
+                        result = self.calculator.evaluate(expr)
+                        print(f"\nРезультат: {result}\n")
+                        self._save_result(result)
+                    except Exception as e:
+                        print(f"Ошибка при вычислении: {e}")
+                    if not self._ask_repeat(action_name):
+                        break
             elif choice == '3':
-                expr = self._generate_expression()
-
-            if expr is None:
-                continue
-
-            try:
-                result = self.calculator.evaluate(expr)
-                print(f"\nРезультат: {result}\n")
-                self._save_result(result)
-            except Exception as e:
-                print(f"Ошибка при вычислении: {e}")
-            input("Нажмите Enter, чтобы продолжить...")
+                action_name = "сгенерировать выражение"
+                while True:
+                    expr = self._generate_expression()
+                    if expr is None:
+                        break
+                    try:
+                        result = self.calculator.evaluate(expr)
+                        print(f"\nРезультат: {result}\n")
+                        self._save_result(result)
+                    except Exception as e:
+                        print(f"Ошибка при вычислении: {e}")
+                    if not self._ask_repeat(action_name):
+                        break
